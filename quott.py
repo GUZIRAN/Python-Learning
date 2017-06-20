@@ -84,7 +84,7 @@ class GoogleQuote(Quote):
       #self.append(dt,open_,high,low,close,volume)
 
 
-#this can be added into google.py.
+#this creats monthy average close price,  can be added into google.py.
 
 def monthly(symbol,start_date,end_date=datetime.date.today().isoformat()):
 		quote = GoogleQuote(symbol,start_date,end_date).quoteframe
