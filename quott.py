@@ -1,22 +1,3 @@
-# Copyright (c) 2011, Mark Chenoweth
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without modification, are permitted 
-# provided that the following conditions are met:
-#
-# - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-#
-# - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following 
-#   disclaimer in the documentation and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
-# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
-# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 import urllib,time,datetime,pandas
 
 class Quote(object):
@@ -27,17 +8,7 @@ class Quote(object):
   def __init__(self):
     self.symbol = ''
     header=['Date','Open','High','Low','Close','Volume']
-    self.quoteframe=pandas.DataFrame([],columns=header) #build an empty DataFrame
-    #self.date,self.time,self.open_,self.high,self.low,self.close,self.volume = ([] for _ in range(7))
-
-  #def append(self,dt,open_,high,low,close,volume):
-    #self.date.append(dt.date())
-    #self.time.append(dt.time())
-    #self.open_.append(float(open_))
-    #self.high.append(float(high))
-    #self.low.append(float(low))
-    #self.close.append(float(close))
-    #self.volume.append(int(volume))
+    self.quoteframe=pandas.DataFrame([],columns=header) 
       
   def to_csv(self):
     return ''.join(["{0}  {1}  {2:.2f}  {3:.2f}  {4:.2f}  {5:.2f}  {6:,}\n".format(self.symbol,
@@ -81,11 +52,15 @@ class GoogleQuote(Quote):
       volume=int(volume)
       dt = datetime.datetime.strptime(ds,'%d-%b-%y')
       self.quoteframe.loc[bar]=[dt,open_,high,low,close,volume]
-      #self.append(dt,open_,high,low,close,volume)
+
+
+
+
+
+
 
 
 #this creats monthy average close price,  can be added into google.py.
-
 def monthly(symbol,start_date,end_date=datetime.date.today().isoformat()):
 		quote = GoogleQuote(symbol,start_date,end_date).quoteframe
 		month = []  # create an empty list for month
@@ -95,14 +70,4 @@ def monthly(symbol,start_date,end_date=datetime.date.today().isoformat()):
 		quote['Month'] = month
 		quoteMonthly = quote.groupby('Month').Close.mean().reset_index().rename(columns={'Close':symbol})
 		return quoteMonthly
-
-#if __name__ == '__main__':
-  #q = GoogleQuote('aapl','2017-01-01')              # download year to date Apple data
-  #print q                                          # print it out
-  #q = GoogleQuote('orcl','2017-01-01') # 
-  #q.write_csv('orcl.csv')                           # save it to disk
-  #q = Quote()                                       # create a generic quote object
-  #q.read_csv('orcl.csv')                            # populate it with our previously saved data
-  #print q.quoteframe                                          # print it out
-  
 
