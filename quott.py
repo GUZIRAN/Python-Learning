@@ -1,3 +1,4 @@
+
 import urllib,time,datetime,pandas
 
 class Quote(object):
@@ -8,7 +9,8 @@ class Quote(object):
   def __init__(self):
     self.symbol = ''
     header=['Date','Open','High','Low','Close','Volume']
-    self.quoteframe=pandas.DataFrame([],columns=header) 
+    self.quoteframe=pandas.DataFrame([],columns=header) #build an empty DataFrame
+
       
   def to_csv(self):
     return ''.join(["{0}  {1}  {2:.2f}  {3:.2f}  {4:.2f}  {5:.2f}  {6:,}\n".format(self.symbol,
@@ -53,21 +55,24 @@ class GoogleQuote(Quote):
       dt = datetime.datetime.strptime(ds,'%d-%b-%y')
       self.quoteframe.loc[bar]=[dt,open_,high,low,close,volume]
 
-
-
-
-
-
-
-
-#this creats monthy average close price,  can be added into google.py.
-def monthly(symbol,start_date,end_date=datetime.date.today().isoformat()):
-		quote = GoogleQuote(symbol,start_date,end_date).quoteframe
+class monthly(GoogleQuote):
+	def __init__(self,symbol,attrib,stat,start_date,end_date=datetime.date.today().isoformat()):  #default using monthly mean closing price
+		super(monthly,self).__init__(symbol,start_date,end_date)
+		quote = self.quoteframe
 		month = []  # create an empty list for month
 		for bar in xrange(0,len(quote)):
 			month.append(str(quote.Date[bar].year) + '-' +
 			 str(quote.Date[bar].month).zfill(2))
 		quote['Month'] = month
-		quoteMonthly = quote.groupby('Month').Close.mean().reset_index().rename(columns={'Close':symbol})
-		return quoteMonthly
+                if stat == 'max':
+                    self.quoteframe = quote.groupby('Month')[attrib].max().reset_index().rename(columns={attrib:self.symbol})
+                elif stat == 'min':
+                    self.quoteframe = quote.groupby('Month')[attrib].min().reset_index().rename(columns={attrib:self.symbol})
+                else:
+                    print  "Monthly average was used for " + self.symbol + " from " + start_date + " to " +end_date
+                    self.quoteframe = quote.groupby('Month')[attrib].mean().reset_index().rename(columns={attrib:self.symbol})
+                                                
+	def __repr__(self):
+		return ''.join(["{0}, {1}, {2:.2f} \n".format(self.symbol, self.quoteframe['Month'][bar], self.quoteframe[self.symbol][bar]) 
+              for bar in xrange(len(self.quoteframe))])
 
